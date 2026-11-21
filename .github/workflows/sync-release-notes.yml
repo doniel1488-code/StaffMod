@@ -1,0 +1,29 @@
+name: Sync published release notes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - RELEASE_NOTES.md
+
+permissions:
+  contents: write
+
+jobs:
+  sync-release-description:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Update the latest published release description
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="$(gh release list --repo "$GITHUB_REPOSITORY" --limit 1 --json tagName --jq '.[0].tagName')"
+          if [[ -z "$tag" ]]; then
+            echo "No published release found; skipping."
+            exit 0
+          fi
+          gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --notes-file RELEASE_NOTES.md
