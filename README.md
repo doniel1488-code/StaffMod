@@ -1,76 +1,78 @@
 # Governix Staff Companion
 
-A client-side Fabric mod that provides a custom staff dashboard for the Governix Minecraft server.
+Клиентский мод для Fabric, предназначенный **исключительно для Minecraft-проекта Governix**. Он добавляет собственную панель инструментов персонала, связанную с серверными командами и плагинами Governix.
 
-The mod is a client companion only. Staff permissions, anti-cheat decisions, punishments, checks, and command results remain controlled by the server and its installed plugins.
+> **Важно:** этот мод разработан под конкретную инфраструктуру и процессы проекта Governix. Он не является универсальным модом для администрирования Minecraft-серверов и не предназначен для сторонних серверов, сетей или проектов. Использование регулируется ограничительной лицензией в файле [LICENSE](LICENSE).
 
-## Supported Minecraft versions
+Мод работает на стороне клиента. Права персонала, решения античита, наказания, проверки игроков и результаты команд определяются сервером и установленными на нём плагинами.
 
-| Minecraft version | Build module | Runtime Java |
+## Поддерживаемые версии Minecraft
+
+| Версия Minecraft | Модуль сборки | Java во время запуска |
 | --- | --- | ---: |
 | 1.21.11 | `mc12111` | 21 |
 | 26.1.2 | `mc2612` | 25 |
 | 26.2 | `mc262` | 25 |
 | 26.3 | `mc263` | 25 |
 
-Each Minecraft version has its own build and output JAR. **Do not install a JAR built for a different Minecraft version.** The versions listed above have passed the corresponding GitHub Actions build. In-game testing on every target version has not yet been completed.
+Для каждой версии Minecraft создаётся отдельный JAR-файл. **Не устанавливайте JAR, собранный для другой версии Minecraft.** Все перечисленные варианты прошли соответствующую сборку в GitHub Actions. Ручное тестирование в игре на каждой целевой версии ещё не завершено.
 
-Pre-built JARs are published on the [GitHub Releases page](https://github.com/doniel1488-code/StaffMod/releases). Build logs and CI artifacts are available under [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions).
+Готовые JAR-файлы находятся на странице [GitHub Releases](https://github.com/doniel1488-code/StaffMod/releases). Логи сборок и CI-артефакты доступны во вкладке [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions).
 
-## Features
+## Возможности
 
-- Open the staff dashboard with **Right Shift**. The key can be rebound in Minecraft's Controls settings.
-- A custom-drawn interface with no vanilla inventory/container screen, stock button widgets, or stock text-field widgets.
-- Separate sections for overview, anti-cheat tools, player checks, player tools, and Staff Chat.
-- Russian and English keybind names.
-- Player-name validation before player-targeted commands are sent.
-- The client reports that a command was sent; it does not invent or simulate a successful server response.
+- Открытие панели персонала клавишей **Right Shift**. Клавишу можно переназначить в настройках управления Minecraft.
+- Собственный интерфейс без стандартного экрана инвентаря/контейнера Minecraft и стандартных виджетов кнопок и текстовых полей.
+- Разделы обзора, инструментов античита, проверок игроков, инструментов для игроков и чата персонала.
+- Русские и английские названия назначения клавиш.
+- Проверка имени игрока перед отправкой команд, в которых требуется указать игрока.
+- Клиент сообщает об отправке команды, но не подменяет ответ сервера и не изображает успешное выполнение команды без подтверждения.
 
-## Requirements
+## Требования
 
-- Fabric Loader for the exact Minecraft version you use.
-- Fabric API for that same Minecraft version.
-- Java 21 for Minecraft 1.21.11, or Java 25 for Minecraft 26.x.
+- Fabric Loader для используемой версии Minecraft.
+- Fabric API для той же версии Minecraft.
+- Java 21 для Minecraft 1.21.11 или Java 25 для Minecraft 26.x.
 
-The 1.21.11 build is compiled for Java 21 bytecode. Its GitHub Actions build uses JDK 25 to run the current Gradle/Fabric Loom toolchain.
+Сборка для Minecraft 1.21.11 скомпилирована с байткодом Java 21. В GitHub Actions для запуска текущего инструментария Gradle/Fabric Loom используется JDK 25.
 
-## Installation
+## Установка
 
-1. Install Fabric Loader for your Minecraft version.
-2. Install the matching Fabric API release.
-3. Download the `GovernixStaffMod` JAR built for your exact Minecraft version from [Releases](https://github.com/doniel1488-code/StaffMod/releases).
-4. Put the JAR in your Minecraft `mods` folder.
-5. Start the Fabric profile and join a server where you have the required staff permissions.
-6. Press **Right Shift** to open the dashboard.
+1. Установите Fabric Loader для своей версии Minecraft.
+2. Установите соответствующую версию Fabric API.
+3. Скачайте JAR-файл `GovernixStaffMod`, соответствующий вашей версии Minecraft, со страницы [Releases](https://github.com/doniel1488-code/StaffMod/releases).
+4. Поместите JAR-файл в папку `mods` клиента Minecraft.
+5. Запустите профиль Fabric и подключитесь к официальному серверу проекта Governix, имея необходимые права персонала.
+6. Нажмите **Right Shift**, чтобы открыть панель.
 
-Do not put the Paper server plugin JAR in the client `mods` folder. This repository contains the client mod source and builds only.
+Не помещайте JAR серверного плагина Paper в папку клиентских модов. Этот репозиторий содержит только исходный код и сборки клиентского мода.
 
-## Governix server integration
+## Интеграция с сервером Governix
 
-The dashboard sends existing commands to the connected server. The server is authoritative and must have the corresponding command handlers installed. The current UI references these commands:
+Панель отправляет существующие команды на подключённый сервер. Обработку команд выполняет сервер: на нём должны быть установлены соответствующие плагины и обработчики. В текущем интерфейсе используются следующие команды:
 
-| Purpose | Command |
+| Назначение | Команда |
 | --- | --- |
-| Anti-cheat alerts | `/gov alerts` |
-| Verbose output | `/gov verbose` |
-| Anti-cheat version/status | `/gov version` |
-| AI status | `/gov ai status` |
-| Player anti-cheat profile | `/gov profile <player>` |
-| Player modification report | `/gov mods <player>` |
-| Start a player check | `/check <player>` |
-| Repeat AnyDesk instructions | `/check anydesk <player>` |
-| Finish a player check | `/check finish <player>` |
-| Open the check verdict flow | `/checkban <player>` |
-| Spectate a player / stop spectating | `/spec <player>` / `/spec` |
-| Staff Chat | `/sc <message>` |
+| Оповещения античита | `/gov alerts` |
+| Подробный вывод античита | `/gov verbose` |
+| Версия и состояние античита | `/gov version` |
+| Состояние ИИ | `/gov ai status` |
+| Профиль игрока в античите | `/gov profile <player>` |
+| Отчёт о модификациях игрока | `/gov mods <player>` |
+| Начать проверку игрока | `/check <player>` |
+| Повторить инструкцию AnyDesk | `/check anydesk <player>` |
+| Завершить проверку игрока | `/check finish <player>` |
+| Открыть процесс вынесения вердикта | `/checkban <player>` |
+| Начать наблюдение за игроком / прекратить наблюдение | `/spec <player>` / `/spec` |
+| Чат персонала | `/sc <message>` |
 
-The availability, syntax, and permission requirements of these commands depend on the server-side plugin versions and configuration. A command can be rejected by the server. The client does not bypass permissions or enforcement.
+Доступность, синтаксис и требования к правам для этих команд зависят от версий серверных плагинов и их конфигурации. Сервер может отклонить команду. Клиентский мод не обходит систему прав и серверные ограничения.
 
-## Build from source
+## Сборка из исходного кода
 
-Use JDK 25 to run Gradle and the Fabric Loom plugin. The 1.21.11 module separately targets Java 21.
+Для запуска Gradle и плагина Fabric Loom используйте JDK 25. Модуль для Minecraft 1.21.11 отдельно нацелен на Java 21.
 
-Build an individual target:
+Сборка отдельной версии:
 
 ```bash
 gradle :mc12111:build
@@ -79,34 +81,38 @@ gradle :mc262:build
 gradle :mc263:build
 ```
 
-Or build every module:
+Сборка всех модулей:
 
 ```bash
 gradle :mc12111:build :mc2612:build :mc262:build :mc263:build
 ```
 
-The resulting JAR files are written to each module's `build/libs/` directory.
+Готовые JAR-файлы появятся в папках `build/libs/` соответствующих модулей.
 
-## Continuous integration
+**Сборка или просмотр исходного кода не дают права использовать мод в стороннем проекте.** Условия использования подробно описаны в [LICENSE](LICENSE).
 
-GitHub Actions builds each supported Minecraft target independently and uploads a separate artifact:
+## Непрерывная интеграция
+
+GitHub Actions собирает каждую поддерживаемую версию Minecraft отдельно и публикует отдельный артефакт:
 
 - `GovernixStaffMod-1.21.11`
 - `GovernixStaffMod-26.1.2`
 - `GovernixStaffMod-26.2`
 - `GovernixStaffMod-26.3`
 
-See [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions) for build logs and temporary CI artifacts.
+Логи сборок и временные CI-артефакты доступны на странице [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions).
 
-## Project layout
+## Структура проекта
 
-- `mc12111/` — Minecraft 1.21.11 client source.
-- `mc2612/` — Minecraft 26.1.2 client source.
-- `mc262/` — Minecraft 26.2 client source.
-- `mc263/` — Minecraft 26.3 client source.
-- `.github/workflows/build.yml` — version-specific CI builds.
-- `.github/workflows/release.yml` — tagged release build and publishing workflow.
+- `mc12111/` — клиентский исходный код для Minecraft 1.21.11.
+- `mc2612/` — клиентский исходный код для Minecraft 26.1.2.
+- `mc262/` — клиентский исходный код для Minecraft 26.2.
+- `mc263/` — клиентский исходный код для Minecraft 26.3.
+- `.github/workflows/build.yml` — CI-сборки для отдельных версий.
+- `.github/workflows/release.yml` — сборка и публикация релиза по тегу.
 
-## License
+## Лицензия
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for the full text.
+Проект распространяется по специальной ограничительной лицензии **Governix Staff Companion**. Разрешённое использование ограничено официальным Minecraft-проектом Governix. Использование в сторонних проектах, на других серверах или в других сетях запрещено без предварительного письменного разрешения правообладателя.
+
+Полный текст условий находится в файле [LICENSE](LICENSE).
