@@ -15,6 +15,8 @@ The mod is a client companion only. Staff permissions, anti-cheat decisions, pun
 
 Each Minecraft version has its own build and output JAR. **Do not install a JAR built for a different Minecraft version.** The versions listed above have passed the corresponding GitHub Actions build. In-game testing on every target version has not yet been completed.
 
+Pre-built JARs are published on the [GitHub Releases page](https://github.com/doniel1488-code/StaffMod/releases). Build logs and CI artifacts are available under [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions).
+
 ## Features
 
 - Open the staff dashboard with **Right Shift**. The key can be rebound in Minecraft's Controls settings.
@@ -36,7 +38,7 @@ The 1.21.11 build is compiled for Java 21 bytecode. Its GitHub Actions build use
 
 1. Install Fabric Loader for your Minecraft version.
 2. Install the matching Fabric API release.
-3. Download the `GovernixStaffMod` JAR built for your exact Minecraft version.
+3. Download the `GovernixStaffMod` JAR built for your exact Minecraft version from [Releases](https://github.com/doniel1488-code/StaffMod/releases).
 4. Put the JAR in your Minecraft `mods` folder.
 5. Start the Fabric profile and join a server where you have the required staff permissions.
 6. Press **Right Shift** to open the dashboard.
@@ -80,7 +82,7 @@ gradle :mc263:build
 Or build every module:
 
 ```bash
-gradle build
+gradle :mc12111:build :mc2612:build :mc262:build :mc263:build
 ```
 
 The resulting JAR files are written to each module's `build/libs/` directory.
@@ -94,7 +96,7 @@ GitHub Actions builds each supported Minecraft target independently and uploads 
 - `GovernixStaffMod-26.2`
 - `GovernixStaffMod-26.3`
 
-See [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions) for build logs and artifacts.
+See [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions) for build logs and temporary CI artifacts.
 
 ## Project layout
 
@@ -103,6 +105,7 @@ See [GitHub Actions](https://github.com/doniel1488-code/StaffMod/actions) for bu
 - `mc262/` — Minecraft 26.2 client source.
 - `mc263/` — Minecraft 26.3 client source.
 - `.github/workflows/build.yml` — version-specific CI builds.
+- `.github/workflows/release.yml` — tagged release build and publishing workflow.
 
 ## License
 

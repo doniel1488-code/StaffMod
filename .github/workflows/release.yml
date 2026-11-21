@@ -1,0 +1,69 @@
+name: Publish Governix Staff Companion
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  publish-v0-2-0:
+    if: github.event.head_commit.message == 'release: v0.2.0'
+    name: Build and publish v0.2.0
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21 target
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Java 25 build runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.8.2"
+
+      - name: Build all supported Minecraft versions
+        run: gradle :mc12111:build :mc2612:build :mc262:build :mc263:build
+
+      - name: Prepare release JARs and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          for module in mc12111 mc2612 mc262 mc263; do
+            jar_path="$(find "$module/build/libs" -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' -print -quit)"
+            if [[ -z "$jar_path" ]]; then
+              echo "No production JAR found for $module" >&2
+              exit 1
+            fi
+            cp "$jar_path" release-assets/
+          done
+          test "$(find release-assets -maxdepth 1 -type f -name '*.jar' | wc -l)" -eq 4
+          (
+            cd release-assets
+            sha256sum ./*.jar > SHA256SUMS.txt
+          )
+          ls -lah release-assets
+
+      - name: Create GitHub Release and upload JARs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.2.0 \
+            release-assets/*.jar \
+            release-assets/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Governix Staff Companion v0.2.0" \
+            --notes-file RELEASE_NOTES.md
