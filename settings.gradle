@@ -7,4 +7,4 @@ pluginManagement {
 }
 
 rootProject.name = "GovernixStaffMod"
-include("mc12111", "mc263")
+include("mc12111", "mc2612", "mc262", "mc263")

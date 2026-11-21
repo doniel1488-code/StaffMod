@@ -34,6 +34,46 @@ jobs:
           path: mc12111/build/libs/*.jar
           if-no-files-found: error
 
+  build-26-1-2:
+    name: Minecraft 26.1.2 (Java 25)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.8.2"
+      - name: Build 26.1.2
+        run: gradle :mc2612:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GovernixStaffMod-26.1.2
+          path: mc2612/build/libs/*.jar
+          if-no-files-found: error
+
+  build-26-2:
+    name: Minecraft 26.2 (Java 25)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.8.2"
+      - name: Build 26.2
+        run: gradle :mc262:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GovernixStaffMod-26.2
+          path: mc262/build/libs/*.jar
+          if-no-files-found: error
+
   build-26-3:
     name: Minecraft 26.3 (Java 25)
     runs-on: ubuntu-latest

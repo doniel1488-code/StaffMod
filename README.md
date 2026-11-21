@@ -7,14 +7,16 @@ A client-side Fabric staff dashboard for the Governix Minecraft server. This rep
 | Minecraft | Module | Java |
 | --- | --- | ---: |
 | 1.21.11 | mc12111 | 21 |
+| 26.1.2 | mc2612 | 25 |
+| 26.2 | mc262 | 25 |
 | 26.3.x | mc263 | 25 |
 
-Each line is compiled separately. A JAR compiled for one line is not advertised as compatible with the other. This initial 26.x target is 26.3.x; 26.1 and 26.2 need their own compile and runtime verification before being listed as supported.
+Each release line has a separate compiled module. A JAR compiled for one Minecraft line is not advertised as compatible with another. The listed versions are the versions actually built by CI; additional point releases are added only after a compile check.
 
 ## Interface
 
 - Open the panel with Right Shift (rebindable in Minecraft Controls).
-- The 26.3 dashboard is custom-drawn: no inventory/container screen, fake server menu, stock buttons or stock text fields.
+- Both the 1.21.11 and 26.x dashboards are custom-drawn; no inventory/container screen or stock button/text-field widgets are used.
 - Pages: overview, anti-cheat, checks, player tools and Staff Chat.
 - Russian and English keybind labels.
 
@@ -34,6 +36,8 @@ A command may be denied by the server or may differ on another plugin version. T
 ## Build
 
 - gradle :mc12111:build
+- gradle :mc2612:build
+- gradle :mc262:build
 - gradle :mc263:build
 
-GitHub Actions builds both targets independently and uploads separate JAR artifacts. No plugin JAR is stored in this repository.
+GitHub Actions builds each target independently and uploads separate JAR artifacts. No server plugin JAR is stored in this repository.
