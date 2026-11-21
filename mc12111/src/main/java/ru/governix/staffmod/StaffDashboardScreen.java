@@ -78,17 +78,17 @@ public final class StaffDashboardScreen extends Screen {
                 addAction(contentX, 196, contentW, "Диагностика AI", "/gov ai status");
             }
             case "checks" -> {
-                addAction(contentX, 142, contentW, "Вызвать на проверку", "/check " + playerToken());
-                addAction(contentX, 170, contentW, "Повторить инструкцию AnyDesk", "/check anydesk " + playerToken());
-                addAction(contentX, 198, contentW, "Завершить проверку", "/check finish " + playerToken());
-                addAction(contentX, 226, contentW, "Открыть серверный вердикт", "/checkban " + playerToken());
+                addAction(contentX, 142, contentW, "Вызвать на проверку", "/check <player>");
+                addAction(contentX, 170, contentW, "Повторить инструкцию AnyDesk", "/check anydesk <player>");
+                addAction(contentX, 198, contentW, "Завершить проверку", "/check finish <player>");
+                addAction(contentX, 226, contentW, "Открыть серверный вердикт", "/checkban <player>");
             }
             case "player" -> {
-                addAction(contentX, 142, contentW, "Профиль античита", "/gov profile " + playerToken());
-                addAction(contentX, 170, contentW, "Скрытое наблюдение", "/spec " + playerToken());
-                addAction(contentX, 198, contentW, "Отчёт о модификациях", "/gov mods " + playerToken());
+                addAction(contentX, 142, contentW, "Профиль античита", "/gov profile <player>");
+                addAction(contentX, 170, contentW, "Скрытое наблюдение", "/spec <player>");
+                addAction(contentX, 198, contentW, "Отчёт о модификациях", "/gov mods <player>");
             }
-            case "staff" -> addAction(contentX, 142, contentW, "Отправить в Staff Chat", "/sc " + chatToken());
+            case "staff" -> addAction(contentX, 142, contentW, "Отправить в Staff Chat", "/sc <message>");
         }
     }
 
@@ -102,17 +102,19 @@ public final class StaffDashboardScreen extends Screen {
 
     private void addAction(int x, int y, int w, String label, String command) {
         addDrawableChild(ButtonWidget.builder(Text.literal(label), button -> {
-            String actual = command.replace("<player>", playerToken()).replace("<message>", chatToken());
-            if (actual.endsWith(" ") || actual.matches(".*\\s+$") || actual.matches(".+ (null)?$")) {
-                status = "Сначала заполните поле.";
+            String player = playerToken();
+            String message = chatToken();
+            if (command.contains("<player>") && !player.matches("[A-Za-z0-9_]{3,16}")) {
+                status = "Введите корректный ник (3–16 символов).";
                 return;
             }
-            if (actual.contains("  ")) {
-                status = "Проверьте введённые данные.";
+            if (command.contains("<message>") && message.isBlank()) {
+                status = "Введите сообщение для Staff Chat.";
                 return;
             }
+            String actual = command.replace("<player>", player).replace("<message>", message);
             GovernixStaffClient.runServerCommand(actual);
-            status = "Команда отправлена серверу: /" + actual;
+            status = "Команда отправлена серверу. Результат проверки покажет сервер.";
         }).dimensions(x, y, w, 22).build());
     }
 
