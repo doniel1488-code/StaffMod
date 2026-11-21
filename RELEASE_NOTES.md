@@ -1,36 +1,38 @@
 # Governix Staff Companion v0.2.0
 
-Initial public multi-version release of the Governix Staff Companion client mod.
+Первый публичный релиз клиентского мода Governix Staff Companion с отдельными сборками для нескольких версий Minecraft.
 
-## Downloads
+## Загрузки
 
-Choose the JAR that matches your exact Minecraft version:
+Выберите JAR-файл, который соответствует вашей версии Minecraft:
 
-- **Minecraft 1.21.11** — Java 21 runtime
-- **Minecraft 26.1.2** — Java 25 runtime
-- **Minecraft 26.2** — Java 25 runtime
-- **Minecraft 26.3** — Java 25 runtime
+- **Minecraft 1.21.11** — Java 21 во время запуска
+- **Minecraft 26.1.2** — Java 25 во время запуска
+- **Minecraft 26.2** — Java 25 во время запуска
+- **Minecraft 26.3** — Java 25 во время запуска
 
-Each JAR is built separately. Do not use a JAR from a different Minecraft version.
+Каждый JAR-файл собирается отдельно. Не используйте сборку для другой версии Minecraft.
 
-## Included
+## Что включено
 
-- Custom-drawn staff dashboard opened with Right Shift.
-- Overview, anti-cheat, player-check, player-tools, and Staff Chat sections.
-- Russian and English keybind names.
-- Player-name validation for player-targeted commands.
-- Server-authoritative command handling: the client does not bypass staff permissions or claim that a command succeeded before the server responds.
+- Собственная панель персонала, открываемая клавишей Right Shift.
+- Разделы обзора, античита, проверок игроков, инструментов для игроков и чата персонала.
+- Русские и английские названия назначения клавиш.
+- Проверка имени игрока перед отправкой команд, адресованных конкретному игроку.
+- Выполнение команд под контролем сервера: клиент не обходит права персонала и не сообщает об успехе до ответа сервера.
 
-## Installation
+## Установка
 
-1. Install Fabric Loader for your Minecraft version.
-2. Install the matching Fabric API.
-3. Download the matching Governix Staff Companion JAR from this release.
-4. Place the JAR in the Minecraft `mods` folder.
-5. Launch the matching Fabric profile and press **Right Shift** in-game.
+1. Установите Fabric Loader для своей версии Minecraft.
+2. Установите соответствующую версию Fabric API.
+3. Скачайте подходящий JAR-файл Governix Staff Companion из этого релиза.
+4. Поместите JAR-файл в папку `mods` клиента Minecraft.
+5. Запустите соответствующий профиль Fabric и нажмите **Right Shift** в игре.
 
-## Compatibility and verification
+## Совместимость и проверка
 
-All four release targets passed their separate GitHub Actions build and JAR packaging jobs. Manual in-game testing on every target version has not yet been completed. The server must also provide the commands listed in the README and grant the required permissions.
+Все четыре варианта прошли отдельные сборки и упаковку JAR-файлов в GitHub Actions. Ручное тестирование в игре на каждой целевой версии ещё не завершено. На сервере также должны быть доступны команды, перечисленные в README, а у пользователя должны быть необходимые права.
 
-The project is distributed under the MIT License.
+## Лицензия и назначение
+
+Мод предназначен исключительно для официального Minecraft-проекта Governix. Использование на сторонних серверах, в других сетях или проектах запрещено без предварительного письменного разрешения правообладателя. Полные условия приведены в файле [LICENSE](LICENSE).
