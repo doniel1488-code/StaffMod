@@ -1,34 +1,71 @@
-# Governix Staff Companion v0.2.1
+<!-- GOVERNIX RELEASE HEADER -->
+<p align="center">
+  <strong>GOVERNIX</strong><br/>
+  <strong>STAFF COMPANION</strong><br/>
+  <sub>Клиентская панель персонала · Fabric · Только для проекта Governix</sub>
+</p>
 
-Патч для Governix Staff Companion. Основное исправление этого выпуска — устранение клиентского краша при отрисовке панели персонала в Minecraft 1.21.11.
+<p align="center">
+  <img alt="Версия 0.2.1" src="https://img.shields.io/badge/VERSION-0.2.1-8B7CFF?style=for-the-badge"/>
+  <img alt="Fabric" src="https://img.shields.io/badge/LOADER-FABRIC-E6B85C?style=for-the-badge"/>
+  <img alt="Исправление краша" src="https://img.shields.io/badge/UPDATE-CRASH%20FIX-37B879?style=for-the-badge"/>
+</p>
 
-## Исправления
+---
 
-- Убран вызов ванильной отрисовки фона с blur из собственной панели. Панель использует собственный фон, поэтому дополнительное размытие не требуется.
-- Исправлена причина исключения `Can only blur once per frame`, возникавшего в `StaffDashboardScreen` при рендеринге.
-- Остальные элементы панели, страницы, ввод текста и отправка серверных команд не менялись.
+## ✦ Что нового в 0.2.1
 
-## Поддерживаемые версии
+**Исправлен вылет клиента при открытии панели персонала в Minecraft 1.21.11.**
 
-- **Minecraft 1.21.11** — Java 21 во время запуска
-- **Minecraft 26.1.2** — Java 25 во время запуска
-- **Minecraft 26.2** — Java 25 во время запуска
-- **Minecraft 26.3** — Java 25 во время запуска
+Причина — повторный вызов размытия фона в одном кадре (<code>Can only blur once per frame</code>). Панель уже рисует собственный фон, поэтому лишний вызов ванильного blur удалён.
 
-Для каждой версии используется отдельный JAR. Не устанавливайте сборку, предназначенную для другой версии Minecraft.
+Интерфейс, разделы, ввод текста и отправка серверных команд не менялись.
 
-## Установка
+## ↓ Скачать
 
-1. Установите Fabric Loader для своей версии Minecraft.
-2. Установите Fabric API той же версии.
-3. Скачайте JAR-файл v0.2.1, соответствующий вашей версии Minecraft.
-4. Замените старый JAR в папке `mods` новым.
-5. Запустите Minecraft.
+Выбери файл строго под свою версию Minecraft. **Не устанавливай JAR от другой версии игры.**
 
-## Проверка
+| Minecraft | Java при запуске | Файл |
+|:--|:--:|:--|
+| **1.21.11** | 21 | [Скачать JAR](https://github.com/doniel1488-code/StaffMod/releases/download/v0.2.1/GovernixStaffMod-1.21.11-0.2.1.jar) |
+| **26.1.2** | 25 | [Скачать JAR](https://github.com/doniel1488-code/StaffMod/releases/download/v0.2.1/GovernixStaffMod-26.1.2-0.2.1.jar) |
+| **26.2** | 25 | [Скачать JAR](https://github.com/doniel1488-code/StaffMod/releases/download/v0.2.1/GovernixStaffMod-26.2-0.2.1.jar) |
+| **26.3** | 25 | [Скачать JAR](https://github.com/doniel1488-code/StaffMod/releases/download/v0.2.1/GovernixStaffMod-26.3-0.2.1.jar) |
 
-Сборка и упаковка всех поддерживаемых модулей выполняется GitHub Actions. Визуальная проверка в запущенном Minecraft-клиенте для этого исправления отдельно не проводилась; после установки проверьте открытие панели клавишей **Right Shift**.
+<p align="center">
+  <a href="https://github.com/doniel1488-code/StaffMod/releases/download/v0.2.1/SHA256SUMS.txt"><strong>Проверить SHA-256 всех файлов</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/doniel1488-code/StaffMod"><strong>Исходный код</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/doniel1488-code/StaffMod/actions"><strong>Сборки CI</strong></a>
+</p>
 
-## Назначение и лицензия
+## Обновление
 
-Мод предназначен исключительно для официального Minecraft-проекта Governix. Использование на сторонних серверах, в других сетях или проектах запрещено без предварительного письменного разрешения правообладателя. Полные условия приведены в файле [LICENSE](LICENSE).
+1. Полностью закрой Minecraft.
+2. Открой папку <code>.minecraft/mods</code>.
+3. Удали старый <code>GovernixStaffMod-...-0.2.0.jar</code>.
+4. Помести в папку новый JAR для своей версии игры.
+5. Запусти Fabric и открой панель клавишей **Right Shift**.
+
+Не оставляй старую и новую версии мода одновременно.
+
+## Совместимость и проверка
+
+- **Сборка:** все четыре варианта собраны GitHub Actions.
+- **Пакеты:** JAR-файлы и файл контрольных сумм загружены в этот релиз.
+- **Ручной запуск игры:** отдельно не проверялся. После установки проверь открытие панели в своём клиенте.
+
+[Открыть успешную сборку и публикацию v0.2.1](https://github.com/doniel1488-code/StaffMod/actions/runs/44895521400)
+
+## Условия использования
+
+Мод создан исключительно для официального Minecraft-проекта **Governix**. Использование на сторонних серверах, в других сетях или проектах запрещено без предварительного письменного разрешения правообладателя.
+
+[Читать полную лицензию Governix Staff Companion](https://github.com/doniel1488-code/StaffMod/blob/main/LICENSE).
+
+---
+
+<p align="center">
+  <sub>GOVERNIX · STAFF COMPANION · RELEASE 0.2.1</sub>
+</p>
