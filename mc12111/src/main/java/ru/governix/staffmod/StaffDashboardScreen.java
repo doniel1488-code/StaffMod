@@ -93,7 +93,8 @@ public final class StaffDashboardScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
+        // The dashboard draws its own backdrop; vanilla blur can run more than once per frame.
+        // Avoid Screen.renderBackground() here to prevent the 1.21.11 duplicate-blur crash.
         context.fill(0, 0, width, height, BACKDROP);
         context.fill(frameX, frameY, frameX + frameW, frameY + frameH, FRAME);
         border(context, frameX, frameY, frameW, frameH, BORDER);
