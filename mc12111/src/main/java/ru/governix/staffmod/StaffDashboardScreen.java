@@ -1,164 +1,291 @@
 package ru.governix.staffmod;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.CharInput;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Entirely client-rendered dashboard. It intentionally does not use a vanilla
- * inventory screen, container, slot grid, or server-side fake menu.
+ * A fully custom-drawn staff dashboard. It deliberately avoids vanilla
+ * ButtonWidget, TextFieldWidget, inventory and container screens.
  */
 public final class StaffDashboardScreen extends Screen {
-    private static final int BG = 0xF20B1019;
-    private static final int PANEL = 0xFF121B29;
-    private static final int PANEL_ALT = 0xFF172335;
+    private static final int BACKDROP = 0xD9070C14;
+    private static final int FRAME = 0xFF0D1622;
+    private static final int HEADER = 0xFF111E2D;
+    private static final int SIDEBAR = 0xFF101A27;
+    private static final int CARD = 0xFF172638;
+    private static final int CARD_HOVER = 0xFF20354B;
+    private static final int BORDER = 0xFF2B4056;
     private static final int ACCENT = 0xFF8B7CFF;
-    private static final int MUTED = 0xFF9BAAC0;
+    private static final int TEXT = 0xFFF1F5FC;
+    private static final int MUTED = 0xFF9AABC0;
+    private static final int RED = 0xFFFF7777;
 
-    private final List<ButtonWidget> navButtons = new ArrayList<>();
-    private TextFieldWidget playerField;
-    private TextFieldWidget chatField;
-    private String activePage = "overview";
-    private String status = "Команды выполняются сервером и проверяются правами Paper.";
+    private static final String[] PAGES = {
+            "Обзор", "Античит", "Проверки", "Игрок", "Staff Chat"
+    };
+
+    private int page;
+    private int frameX, frameY, frameW, frameH, sidebarW, contentX, contentW, inputY, actionStartY;
+    private String input = "";
+    private boolean inputFocused;
+    private String status = "Действия отправляются серверу. Права и результат определяет Paper.";
+    private boolean statusError;
+
+    private record Action(String label, String command, boolean needsPlayer, boolean needsMessage) {}
 
     public StaffDashboardScreen() {
-        super(Text.literal("GOVERNIX // STAFF CONSOLE"));
+        super(Text.literal("GOVERNIX STAFF CONSOLE"));
     }
 
     @Override
     protected void init() {
-        clearChildren();
-        navButtons.clear();
+        frameW = Math.min(920, Math.max(320, width - 24));
+        frameH = Math.min(540, Math.max(240, height - 24));
+        frameX = (width - frameW) / 2;
+        frameY = (height - frameH) / 2;
+        sidebarW = frameW < 560 ? 116 : 164;
+        contentX = frameX + sidebarW + 22;
+        contentW = Math.max(150, frameW - sidebarW - 44);
+        inputY = frameY + 126;
+        actionStartY = frameY + (usesInput() ? 172 : 132);
+    }
 
-        int navX = 18;
-        int navY = 78;
-        String[][] pages = {
-                {"overview", "Обзор"},
-                {"anticheat", "Античит"},
-                {"checks", "Проверки"},
-                {"player", "Игрок"},
-                {"staff", "Staff Chat"}
+    private boolean usesInput() {
+        return page == 2 || page == 3 || page == 4;
+    }
+
+    private List<Action> actions() {
+        return switch (page) {
+            case 1 -> List.of(
+                    new Action("Переключить AC Alerts", "gov alerts", false, false),
+                    new Action("Переключить Verbose", "gov verbose", false, false),
+                    new Action("Версия и состояние AC", "gov version", false, false),
+                    new Action("Диагностика AI", "gov ai status", false, false)
+            );
+            case 2 -> List.of(
+                    new Action("Вызвать на проверку", "check", true, false),
+                    new Action("Повторить инструкцию AnyDesk", "check anydesk", true, false),
+                    new Action("Завершить проверку", "check finish", true, false),
+                    new Action("Открыть серверный вердикт", "checkban", true, false)
+            );
+            case 3 -> List.of(
+                    new Action("Профиль античита", "gov profile", true, false),
+                    new Action("Начать наблюдение", "spec", true, false),
+                    new Action("Остановить наблюдение", "spec", false, false),
+                    new Action("Отчёт о модификациях", "gov mods", true, false)
+            );
+            case 4 -> List.of(new Action("Отправить сообщение", "sc", false, true));
+            default -> List.of(
+                    new Action("Версия GovernixAC", "gov version", false, false),
+                    new Action("Состояние AI", "gov ai status", false, false),
+                    new Action("Состояние AC Alerts", "gov alerts", false, false)
+            );
         };
-        for (String[] page : pages) {
-            ButtonWidget button = ButtonWidget.builder(Text.literal(page[1]), b -> {
-                activePage = page[0];
-                init();
-            }).dimensions(navX, navY, 112, 22).build();
-            navButtons.add(button);
-            addDrawableChild(button);
-            navY += 27;
-        }
-
-        int contentX = 152;
-        int contentW = Math.max(180, width - contentX - 20);
-        if (activePage.equals("player") || activePage.equals("checks")) {
-            playerField = new TextFieldWidget(textRenderer, contentX, 111, Math.min(250, contentW), 22, Text.literal("Ник игрока"));
-            playerField.setMaxLength(16);
-            playerField.setPlaceholder(Text.literal("Ник игрока"));
-            addDrawableChild(playerField);
-        }
-        if (activePage.equals("staff")) {
-            chatField = new TextFieldWidget(textRenderer, contentX, 111, Math.min(320, contentW), 22, Text.literal("Сообщение Staff Chat"));
-            chatField.setMaxLength(180);
-            chatField.setPlaceholder(Text.literal("Сообщение в Staff Chat"));
-            addDrawableChild(chatField);
-        }
-
-        switch (activePage) {
-            case "overview" -> addAction(contentX, 112, contentW, "Открыть профиль /gov version", "/gov version");
-            case "anticheat" -> {
-                addAction(contentX, 112, contentW, "Переключить AC Alerts", "/gov alerts");
-                addAction(contentX, 140, contentW, "Переключить Verbose", "/gov verbose");
-                addAction(contentX, 168, contentW, "Версия и состояние AC", "/gov version");
-                addAction(contentX, 196, contentW, "Диагностика AI", "/gov ai status");
-            }
-            case "checks" -> {
-                addAction(contentX, 142, contentW, "Вызвать на проверку", "/check <player>");
-                addAction(contentX, 170, contentW, "Повторить инструкцию AnyDesk", "/check anydesk <player>");
-                addAction(contentX, 198, contentW, "Завершить проверку", "/check finish <player>");
-                addAction(contentX, 226, contentW, "Открыть серверный вердикт", "/checkban <player>");
-            }
-            case "player" -> {
-                addAction(contentX, 142, contentW, "Профиль античита", "/gov profile <player>");
-                addAction(contentX, 170, contentW, "Скрытое наблюдение", "/spec <player>");
-                addAction(contentX, 198, contentW, "Отчёт о модификациях", "/gov mods <player>");
-            }
-            case "staff" -> addAction(contentX, 142, contentW, "Отправить в Staff Chat", "/sc <message>");
-        }
-    }
-
-    private String playerToken() {
-        return playerField == null ? "" : playerField.getText().trim();
-    }
-
-    private String chatToken() {
-        return chatField == null ? "" : chatField.getText().trim();
-    }
-
-    private void addAction(int x, int y, int w, String label, String command) {
-        addDrawableChild(ButtonWidget.builder(Text.literal(label), button -> {
-            String player = playerToken();
-            String message = chatToken();
-            if (command.contains("<player>") && !player.matches("[A-Za-z0-9_]{3,16}")) {
-                status = "Введите корректный ник (3–16 символов).";
-                return;
-            }
-            if (command.contains("<message>") && message.isBlank()) {
-                status = "Введите сообщение для Staff Chat.";
-                return;
-            }
-            String actual = command.replace("<player>", player).replace("<message>", message);
-            GovernixStaffClient.runServerCommand(actual);
-            status = "Команда отправлена серверу. Результат проверки покажет сервер.";
-        }).dimensions(x, y, w, 22).build());
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
-        context.fill(0, 0, width, height, BG);
-        context.fill(12, 12, width - 12, 57, PANEL);
-        context.fill(12, 66, 140, height - 12, PANEL);
-        context.fill(148, 66, width - 12, height - 12, PANEL_ALT);
+        context.fill(0, 0, width, height, BACKDROP);
+        context.fill(frameX, frameY, frameX + frameW, frameY + frameH, FRAME);
+        border(context, frameX, frameY, frameW, frameH, BORDER);
+        context.fill(frameX, frameY, frameX + frameW, frameY + 58, HEADER);
+        context.fill(frameX + 1, frameY + 58, frameX + sidebarW, frameY + frameH - 1, SIDEBAR);
 
-        context.drawText(textRenderer, "GOVERNIX", 27, 23, 0xFFFFFFFF, true);
-        context.drawText(textRenderer, "STAFF CONTROL / CLIENT CONSOLE", 120, 25, ACCENT, false);
-        context.drawText(textRenderer, "CUSTOM INTERFACE  •  SERVER-AUTHORISED ACTIONS", 27, 42, MUTED, false);
+        context.drawText(textRenderer, "GOVERNIX", frameX + 20, frameY + 16, TEXT, true);
+        context.drawText(textRenderer, "STAFF CONTROL", frameX + 106, frameY + 18, ACCENT, true);
+        context.drawText(textRenderer, "CUSTOM CLIENT CONSOLE / PAPER-AUTHORISED ACTIONS",
+                frameX + 20, frameY + 39, MUTED, false);
 
-        context.drawText(textRenderer, activeTitle(), 164, 82, 0xFFFFFFFF, true);
-        context.drawText(textRenderer, "Страница использует команды GovernixAC 1.2.7", 164, 96, MUTED, false);
-
-        if (activePage.equals("checks") || activePage.equals("player")) {
-            context.drawText(textRenderer, "ИГРОК", 164, 101, MUTED, false);
+        for (int i = 0; i < PAGES.length; i++) {
+            int y = frameY + 73 + i * 34;
+            boolean selected = page == i;
+            boolean hovered = inside(mouseX, mouseY, frameX + 12, y, sidebarW - 24, 28);
+            context.fill(frameX + 12, y, frameX + sidebarW - 12, y + 28,
+                    selected ? CARD_HOVER : (hovered ? 0xFF182637 : SIDEBAR));
+            if (selected) context.fill(frameX + 12, y, frameX + 15, y + 28, ACCENT);
+            context.drawText(textRenderer, PAGES[i], frameX + 24, y + 10, selected ? TEXT : MUTED, selected);
         }
-        if (activePage.equals("staff")) {
-            context.drawText(textRenderer, "СООБЩЕНИЕ", 164, 101, MUTED, false);
+
+        context.drawText(textRenderer, PAGES[page].toUpperCase(), contentX, frameY + 80, TEXT, true);
+        context.drawText(textRenderer, pageDescription(), contentX, frameY + 98, MUTED, false);
+
+        if (usesInput()) {
+            context.drawText(textRenderer, page == 4 ? "СООБЩЕНИЕ STAFF CHAT" : "НИК ИГРОКА",
+                    contentX, frameY + 116, MUTED, false);
+            int fieldW = Math.min(contentW, 360);
+            context.fill(contentX, inputY, contentX + fieldW, inputY + 28, 0xFF0A121C);
+            border(context, contentX, inputY, fieldW, 28, inputFocused ? ACCENT : BORDER);
+            String shown = input.isEmpty()
+                    ? (page == 4 ? "Введите сообщение..." : "Введите Minecraft-ник")
+                    : input;
+            context.drawText(textRenderer, trim(shown, Math.max(12, fieldW - 18)),
+                    contentX + 9, inputY + 9, input.isEmpty() ? 0xFF71849A : TEXT, false);
+            if (inputFocused && (System.currentTimeMillis() / 500) % 2 == 0) {
+                int cursorX = contentX + 10 + textRenderer.getWidth(trim(input, Math.max(12, fieldW - 20)));
+                context.fill(cursorX, inputY + 7, cursorX + 1, inputY + 21, ACCENT);
+            }
         }
 
+        List<Action> currentActions = actions();
+        for (int i = 0; i < currentActions.size(); i++) {
+            Action action = currentActions.get(i);
+            int y = actionStartY + i * 36;
+            boolean hovered = inside(mouseX, mouseY, contentX, y, contentW, 29);
+            context.fill(contentX, y, contentX + contentW, y + 29, hovered ? CARD_HOVER : CARD);
+            border(context, contentX, y, contentW, 29, hovered ? ACCENT : BORDER);
+            context.drawText(textRenderer, action.label(), contentX + 10, y + 10, TEXT, false);
+            context.drawText(textRenderer, ">", contentX + contentW - 15, y + 10, ACCENT, true);
+        }
+
+        int footerY = frameY + frameH - 42;
+        context.fill(frameX + 12, footerY, frameX + frameW - 12, footerY + 26, 0xFF0A121C);
+        context.drawText(textRenderer, trim(status, Math.max(18, frameW - 200)),
+                frameX + 20, footerY + 9, statusError ? RED : MUTED, false);
+        context.drawText(textRenderer, "RIGHT SHIFT / ESC", frameX + frameW - 116, footerY + 9, MUTED, false);
         super.render(context, mouseX, mouseY, delta);
-        context.fill(160, height - 39, width - 24, height - 22, 0xAA0A111B);
-        context.drawText(textRenderer, trim(status, Math.max(20, (width - 210) / 6)), 168, height - 34, MUTED, false);
-        context.drawText(textRenderer, "RIGHT SHIFT  •  ESC ЗАКРЫТЬ", 20, height - 25, MUTED, false);
     }
 
-    private String activeTitle() {
-        return switch (activePage) {
-            case "anticheat" -> "АНТИЧИТ / ДИАГНОСТИКА";
-            case "checks" -> "ПРОВЕРКА ИГРОКА";
-            case "player" -> "ИНСТРУМЕНТЫ ИГРОКА";
-            case "staff" -> "STAFF COMMUNICATION";
-            default -> "ОБЗОР СИСТЕМЫ";
+    private void border(DrawContext context, int x, int y, int w, int h, int color) {
+        context.fill(x, y, x + w, y + 1, color);
+        context.fill(x, y + h - 1, x + w, y + h, color);
+        context.fill(x, y, x + 1, y + h, color);
+        context.fill(x + w - 1, y, x + w, y + h, color);
+    }
+
+    private String trim(String value, int maxPixelWidth) {
+        if (textRenderer.getWidth(value) <= maxPixelWidth) return value;
+        String suffix = "…";
+        int end = value.length();
+        while (end > 0 && textRenderer.getWidth(value.substring(0, end) + suffix) > maxPixelWidth) {
+            end--;
+        }
+        return value.substring(0, end) + suffix;
+    }
+
+    private boolean inside(double px, double py, int x, int y, int w, int h) {
+        return px >= x && px <= x + w && py >= y && py <= y + h;
+    }
+
+    private String pageDescription() {
+        return switch (page) {
+            case 1 -> "Управление оповещениями и диагностикой античита";
+            case 2 -> "Начало и завершение серверной процедуры проверки";
+            case 3 -> "Профили, наблюдение и сведения о клиенте игрока";
+            case 4 -> "Сообщения в защищённый Staff Chat";
+            default -> "Быстрый доступ к инструментам GovernixAC";
         };
     }
 
-    private String trim(String value, int max) {
-        if (value.length() <= max) return value;
-        return value.substring(0, Math.max(0, max - 1)) + "…";
+    @Override
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (click.buttonInfo().button() != 0) return super.mouseClicked(click, doubled);
+        double mx = click.x();
+        double my = click.y();
+
+        for (int i = 0; i < PAGES.length; i++) {
+            int y = frameY + 73 + i * 34;
+            if (inside(mx, my, frameX + 12, y, sidebarW - 24, 28)) {
+                page = i;
+                inputFocused = false;
+                status = "Раздел открыт. Команды по-прежнему проверяются сервером.";
+                statusError = false;
+                return true;
+            }
+        }
+
+        if (usesInput() && inside(mx, my, contentX, inputY, Math.min(contentW, 360), 28)) {
+            inputFocused = true;
+            return true;
+        }
+        inputFocused = false;
+
+        List<Action> currentActions = actions();
+        for (int i = 0; i < currentActions.size(); i++) {
+            int y = actionStartY + i * 36;
+            if (inside(mx, my, contentX, y, contentW, 29)) {
+                execute(currentActions.get(i));
+                return true;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean keyPressed(KeyInput event) {
+        int key = event.key();
+        if (key == GLFW.GLFW_KEY_ESCAPE) {
+            close();
+            return true;
+        }
+        if (inputFocused && key == GLFW.GLFW_KEY_BACKSPACE) {
+            if (!input.isEmpty()) {
+                int end = input.offsetByCodePoints(input.length(), -1);
+                input = input.substring(0, end);
+            }
+            return true;
+        }
+        return super.keyPressed(event);
+    }
+
+    @Override
+    public boolean charTyped(CharInput event) {
+        if (!inputFocused || !event.isValidChar()) return super.charTyped(event);
+        String addition = event.asString();
+        int max = page == 4 ? 180 : 16;
+        if (input.length() + addition.length() > max) return true;
+        String candidate = input + addition;
+        if (page != 4 && !candidate.matches("[A-Za-z0-9_]*")) return true;
+        if (page == 4 && (addition.contains("\n") || addition.contains("\r"))) return true;
+        input = candidate;
+        return true;
+    }
+
+    private void execute(Action action) {
+        String command;
+        if (action.needsPlayer()) {
+            if (!input.matches("[A-Za-z0-9_]{3,16}")) {
+                setStatus("Введите корректный ник: 3–16 символов A–Z, a–z, 0–9 или _.", true);
+                return;
+            }
+            command = switch (action.command()) {
+                case "check" -> "check " + input;
+                case "check anydesk" -> "check anydesk " + input;
+                case "check finish" -> "check finish " + input;
+                case "checkban" -> "checkban " + input;
+                default -> action.command() + " " + input;
+            };
+        } else if (action.needsMessage()) {
+            String message = input.trim().replaceAll("[\\p{Cntrl}&&[^\\t]]", " ");
+            if (message.isBlank()) {
+                setStatus("Введите сообщение для Staff Chat.", true);
+                return;
+            }
+            command = "sc " + message;
+        } else {
+            command = action.command();
+        }
+
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.getNetworkHandler() == null || client.player == null) {
+            setStatus("Нет активного подключения к серверу.", true);
+            return;
+        }
+        client.getNetworkHandler().sendChatCommand(command);
+        setStatus("Команда отправлена. Дождитесь ответа сервера.", false);
+    }
+
+    private void setStatus(String message, boolean error) {
+        status = message;
+        statusError = error;
     }
 
     @Override
