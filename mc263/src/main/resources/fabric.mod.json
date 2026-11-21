@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "governix_staff",
+  "version": "${version}",
+  "name": "Governix Staff Companion",
+  "description": "A client-side custom staff dashboard for GovernixAC-supported server commands.",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "ru.governix.staffmod26.GovernixStaffClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

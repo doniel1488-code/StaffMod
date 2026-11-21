@@ -1,26 +1,51 @@
-name: Build Staff Companion
+name: Build Governix Staff Mod
+
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   build-1-21-11:
+    name: Minecraft 1.21.11 (Java 21)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.2.1'
-      - name: Build and test
+          gradle-version: "9.2.1"
+      - name: Build 1.21.11
         run: gradle :mc12111:build
       - uses: actions/upload-artifact@v4
         with:
           name: GovernixStaffMod-1.21.11
           path: mc12111/build/libs/*.jar
+          if-no-files-found: error
+
+  build-26-3:
+    name: Minecraft 26.3 (Java 25)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.8.2"
+      - name: Build 26.3
+        run: gradle :mc263:build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GovernixStaffMod-26.3
+          path: mc263/build/libs/*.jar
+          if-no-files-found: error

@@ -1,35 +1,39 @@
 # Governix Staff Companion
 
-Client-side Fabric companion for the **GovernixAC** Paper plugin supplied in this repository.
+A client-side Fabric staff dashboard for the Governix Minecraft server. This repository contains the mod source only; the server-side GovernixAC Paper plugin is maintained and installed separately.
 
-## Scope
+## Compatibility builds
 
-The companion provides a fully custom client screen (no vanilla inventory/container GUI) for staff workflows. Actions are sent as ordinary server commands so the Paper plugin remains the authority for permissions and enforcement.
+| Minecraft | Module | Java |
+| --- | --- | ---: |
+| 1.21.11 | mc12111 | 21 |
+| 26.3.x | mc263 | 25 |
 
-Current plugin-backed actions discovered in GovernixAC 1.2.7:
-- AC alerts: `/gov alerts`
-- Verbose: `/gov verbose`
-- Player profile: `/gov profile <player>`
-- Spectate: `/spec <player>` (toggle off with `/spec`)
-- Start / finish check: `/check <player>`, `/check finish <player>`
-- Check reminder: `/check anydesk <player>`
-- Ban verdict screen on the server: `/checkban <player>`
-- Client-mod report: `/gov mods <player>`
-- AC diagnostics: `/gov version`, `/gov ai status`
-- Staff chat: `/sc <message>`
+Each line is compiled separately. A JAR compiled for one line is not advertised as compatible with the other. This initial 26.x target is 26.3.x; 26.1 and 26.2 need their own compile and runtime verification before being listed as supported.
 
-The client does not grant permissions, bypass server checks, or make anti-cheat decisions. A button can still be rejected by the server if the player lacks the relevant permission.
+## Interface
+
+- Open the panel with Right Shift (rebindable in Minecraft Controls).
+- The 26.3 dashboard is custom-drawn: no inventory/container screen, fake server menu, stock buttons or stock text fields.
+- Pages: overview, anti-cheat, checks, player tools and Staff Chat.
+- Russian and English keybind labels.
+
+## GovernixAC integration contract
+
+The client sends existing commands to the connected Paper server. The server plugin remains authoritative for permissions, staff hierarchy, enforcement and command results. The client does not grant permissions, bypass checks, generate anti-cheat verdicts, or pretend an action succeeded.
+
+Commands referenced by the UI:
+- /gov alerts, /gov verbose, /gov version, /gov ai status
+- /gov profile <player>, /gov mods <player>
+- /check <player>, /check anydesk <player>, /check finish <player>, /checkban <player>
+- /spec <player>, /spec
+- /sc <message>
+
+A command may be denied by the server or may differ on another plugin version. The UI reports only that a command was sent; the server response is the source of truth.
 
 ## Build
 
-The first implementation targets Fabric + Minecraft 1.21.11. Run:
+- gradle :mc12111:build
+- gradle :mc263:build
 
-```sh
-gradle :mc12111:build
-```
-
-The 26.1+ line is a separate compatibility target because Minecraft 26.1 is unobfuscated and Fabric's mappings/tooling changed substantially. It will be added as a separately compiled module; a 1.21.11 JAR must not be advertised as compatible with 26.1.
-
-## Controls
-
-Default key: **Right Shift**. Rebind it in Minecraft Controls under the Governix category.
+GitHub Actions builds both targets independently and uploads separate JAR artifacts. No plugin JAR is stored in this repository.

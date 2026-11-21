@@ -5,12 +5,6 @@ pluginManagement {
         mavenCentral()
     }
 }
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        maven { url = "https://maven.fabricmc.net/" }
-        mavenCentral()
-    }
-}
+
 rootProject.name = "GovernixStaffMod"
-include("mc12111")
+include("mc12111", "mc263")
