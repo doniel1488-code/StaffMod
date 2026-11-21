@@ -10,7 +10,7 @@ public final class GovernixStaffClient implements ClientModInitializer {
     private static final KeyMapping OPEN_PANEL = KeyMappingHelper.registerKeyMapping(
             new KeyMapping(
                     "key.governix_staff.open_panel",
-                    InputConstants.Type.KEYSYM,
+                    InputConstants.Type.KEYBOARD,
                     InputConstants.KEY_RSHIFT,
                     KeyMapping.Category.MISC
             )
