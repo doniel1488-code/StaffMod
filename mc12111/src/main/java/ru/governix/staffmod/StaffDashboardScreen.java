@@ -195,7 +195,9 @@ public final class StaffDashboardScreen extends Screen {
             int y = frameY + 73 + i * 34;
             if (inside(mx, my, frameX + 12, y, sidebarW - 24, 28)) {
                 page = i;
+                input = "";
                 inputFocused = false;
+                actionStartY = frameY + (usesInput() ? 172 : 132);
                 status = "Раздел открыт. Команды по-прежнему проверяются сервером.";
                 statusError = false;
                 return true;
