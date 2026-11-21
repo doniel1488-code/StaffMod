@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "governix_staff",
+  "version": "${version}",
+  "name": "Governix Staff Companion",
+  "description": "Custom client-side staff control panel for the GovernixAC Paper plugin.",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["ru.governix.staffmod.GovernixStaffClient"]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
